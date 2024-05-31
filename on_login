@@ -1,0 +1,29 @@
+# 指定要查询的用户名
+$username = "username"
+
+# 获取登录事件
+$loginEvents = Get-WinEvent -FilterHashtable @{
+    LogName = "Security"
+    ID = 4624
+} | Where-Object { $_.Properties[5].Value -eq $username }
+
+# 获取注销事件
+$logoutEvents = Get-WinEvent -FilterHashtable @{
+    LogName = "Security"
+    ID = 4634
+} | Where-Object { $_.Properties[5].Value -eq $username }
+
+# 输出登录时间和注销时间
+if ($loginEvents.Count -gt 0) {
+    $loginTime = $loginEvents[0].TimeCreated
+    Write-Host "$username logged in at: $loginTime"
+} else {
+    Write-Host "$username has not logged in."
+}
+
+if ($logoutEvents.Count -gt 0) {
+    $logoutTime = $logoutEvents[0].TimeCreated
+    Write-Host "$username logged out at: $logoutTime"
+} else {
+    Write-Host "$username has not logged out."
+}
